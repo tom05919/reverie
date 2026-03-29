@@ -12,7 +12,7 @@ import {
   Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 
 const navItems = [
@@ -33,11 +33,30 @@ const statusConfig: Record<AgentStatus, { color: string; label: string }> = {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const agentStatus: AgentStatus = "negotiating";
-  const status = statusConfig[agentStatus];
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [anonymousMode, setAnonymousMode] = useState(true);
+  const [liveCount, setLiveCount] = useState(0);
+
+  useEffect(() => {
+    const fetchLiveCount = () => {
+      fetch("/api/negotiations")
+        .then((res) => res.json())
+        .then((data) => {
+          const active = (data.sessions ?? []).filter(
+            (s: { status: string }) => s.status === "active",
+          ).length;
+          setLiveCount(active);
+        })
+        .catch(() => {});
+    };
+    fetchLiveCount();
+    const interval = setInterval(fetchLiveCount, 10_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const agentStatus: AgentStatus = liveCount > 0 ? "negotiating" : "online";
+  const status = statusConfig[agentStatus];
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -119,8 +138,13 @@ export function Sidebar() {
             >
               <item.icon className="h-4 w-4 shrink-0" />
               {item.label}
-              {item.href === "/live" && (
-                <span className="ml-auto h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              {item.href === "/live" && liveCount > 0 && (
+                <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500/20 text-[10px] font-medium text-emerald-400 px-1">
+                  {liveCount}
+                </span>
+              )}
+              {item.href === "/live" && liveCount === 0 && (
+                <span className="ml-auto h-2 w-2 rounded-full bg-muted-foreground/30" />
               )}
             </Link>
           );

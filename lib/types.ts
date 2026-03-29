@@ -68,12 +68,31 @@ export interface NegotiationMessage {
   timestamp: string;
 }
 
+export interface DealSummaryTerm {
+  label: string;
+  value: string;
+  party: "mutual" | "our_agent" | "their_agent";
+}
+
+export interface DealSummary {
+  title: string;
+  agreedPrice: string | null;
+  terms: DealSummaryTerm[];
+  summary: string;
+  generatedAt: string;
+}
+
+export type DealApproval = "pending" | "approved" | "rejected";
+
 export interface LiveNegotiation {
   id: string;
   dealTitle: string;
   counterparty: Agent;
   messages: NegotiationMessage[];
-  status: "active" | "paused";
+  status: "active" | "paused" | "completed";
+  outcome?: "agreed" | "stalemate";
+  dealSummary?: DealSummary;
+  approval?: DealApproval;
   anonymous?: boolean;
 }
 
@@ -83,4 +102,28 @@ export interface ActivityItem {
   title: string;
   description: string;
   timestamp: string;
+}
+
+export interface NegotiationAgentConfig {
+  companyName: string;
+  agentName: string;
+  role: "buyer" | "seller";
+  objectives: string[];
+  constraints: {
+    priceFloor?: number;
+    priceCeiling?: number;
+    mustHaves: string[];
+    walkAwayConditions: string[];
+  };
+  style: "collaborative" | "aggressive" | "balanced";
+  dealContext: string;
+}
+
+export interface NegotiationScenario {
+  id: string;
+  title: string;
+  description: string;
+  agentA: NegotiationAgentConfig;
+  agentB: NegotiationAgentConfig;
+  anonymous: boolean;
 }

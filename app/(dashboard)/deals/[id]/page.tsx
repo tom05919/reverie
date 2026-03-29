@@ -1,38 +1,112 @@
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, XCircle, RotateCcw } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Loader2,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DealStatusBadge } from "@/components/status-badge";
 import { AnonymousBadge, AnonymousBanner } from "@/components/anonymous-badge";
-import { deals } from "@/lib/mock-data";
 import { formatCurrency, formatDate, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import type { Deal } from "@/lib/types";
+import React from "react";
 
-export function generateStaticParams() {
-  return deals.map((d) => ({ id: d.id }));
-}
+const termStatusIcon: Record<string, string> = {
+  agreed: "bg-emerald-400",
+  disputed: "bg-red-400",
+  open: "bg-amber-400",
+};
 
-export default async function DealDetailPage({
+export default function DealDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const deal = deals.find((d) => d.id === id);
-  if (!deal) notFound();
+  const router = useRouter();
+  const [deal, setDeal] = useState<Deal | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [approving, setApproving] = useState(false);
+  const resolvedParams = React.use(params);
 
-  const termStatusIcon = {
-    agreed: "bg-emerald-400",
-    disputed: "bg-red-400",
-    open: "bg-amber-400",
+  useEffect(() => {
+    fetch("/api/deals")
+      .then((r) => r.json())
+      .then((data) => {
+        const found = (data.deals as Deal[]).find(
+          (d) => d.id === resolvedParams.id,
+        );
+        setDeal(found ?? null);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [resolvedParams.id]);
+
+  const handleApprove = async () => {
+    if (!deal) return;
+    setApproving(true);
+    try {
+      const res = await fetch(`/api/negotiations/${deal.id}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "approved" }),
+      });
+      if (res.ok) {
+        setDeal((prev) => (prev ? { ...prev, status: "closed_won" } : null));
+      }
+    } finally {
+      setApproving(false);
+    }
   };
+
+  const handleReject = async () => {
+    if (!deal) return;
+    setApproving(true);
+    try {
+      const res = await fetch(`/api/negotiations/${deal.id}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "rejected" }),
+      });
+      if (res.ok) {
+        setDeal((prev) => (prev ? { ...prev, status: "closed_lost" } : null));
+      }
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!deal) {
+    return (
+      <div className="p-6 lg:p-8 text-center space-y-4">
+        <p className="text-muted-foreground">Deal not found.</p>
+        <Button variant="outline" onClick={() => router.push("/deals")}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Deals
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
-      {/* Header */}
       <div className="flex items-start gap-4">
         <Link
           href="/deals"
@@ -56,9 +130,7 @@ export default async function DealDetailPage({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Summary */}
           <Card className="border-border/50">
             <CardHeader>
               <CardTitle className="text-base">Summary</CardTitle>
@@ -70,7 +142,6 @@ export default async function DealDetailPage({
             </CardContent>
           </Card>
 
-          {/* Key Terms */}
           <Card className="border-border/50">
             <CardHeader>
               <CardTitle className="text-base">Key Terms</CardTitle>
@@ -100,7 +171,7 @@ export default async function DealDetailPage({
                       <span
                         className={cn(
                           "h-1.5 w-1.5 rounded-full",
-                          termStatusIcon[term.status]
+                          termStatusIcon[term.status] ?? "bg-neutral-400",
                         )}
                       />
                       <span className="text-xs capitalize text-muted-foreground">
@@ -113,7 +184,6 @@ export default async function DealDetailPage({
             </CardContent>
           </Card>
 
-          {/* Timeline */}
           <Card className="border-border/50">
             <CardHeader>
               <CardTitle className="text-base">Negotiation Timeline</CardTitle>
@@ -155,12 +225,9 @@ export default async function DealDetailPage({
           </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Anonymous indicator */}
           {deal.anonymous && <AnonymousBanner />}
 
-          {/* Strategy Notes */}
           <Card className="border-border/50">
             <CardHeader>
               <CardTitle className="text-base">Agent Strategy Notes</CardTitle>
@@ -172,7 +239,6 @@ export default async function DealDetailPage({
             </CardContent>
           </Card>
 
-          {/* Actions */}
           {deal.status === "pending_approval" && (
             <Card className="border-violet-500/20 bg-violet-500/5">
               <CardHeader>
@@ -183,8 +249,16 @@ export default async function DealDetailPage({
                   Your agent has finished negotiating. Review the terms and take
                   action.
                 </p>
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white">
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                <Button
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white"
+                  onClick={handleApprove}
+                  disabled={approving}
+                >
+                  {approving ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                  )}
                   Approve Deal
                 </Button>
                 <Button
@@ -197,10 +271,44 @@ export default async function DealDetailPage({
                 <Button
                   variant="outline"
                   className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10"
+                  onClick={handleReject}
+                  disabled={approving}
                 >
                   <XCircle className="mr-2 h-4 w-4" />
                   Reject
                 </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {deal.status === "closed_won" && (
+            <Card className="border-emerald-500/20 bg-emerald-500/5">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                  <p className="text-sm font-medium text-emerald-400">
+                    Deal Approved
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  This deal has been approved and is being tracked in your pipeline.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {deal.status === "closed_lost" && (
+            <Card className="border-red-500/20 bg-red-500/5">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-red-400" />
+                  <p className="text-sm font-medium text-red-400">
+                    Deal Rejected
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  This deal was reviewed and rejected.
+                </p>
               </CardContent>
             </Card>
           )}
