@@ -9,12 +9,14 @@ import {
   MessageSquare,
   Radio,
   Upload,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useRef } from "react";
+import { Switch } from "@/components/ui/switch";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/interactions", label: "Interactions", icon: History },
   { href: "/deals", label: "Deals", icon: Handshake },
   { href: "/chat", label: "Chat", icon: MessageSquare },
@@ -35,6 +37,7 @@ export function Sidebar() {
   const status = statusConfig[agentStatus];
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+  const [anonymousMode, setAnonymousMode] = useState(true);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -47,17 +50,17 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-sidebar-border bg-sidebar">
       {/* Brand */}
-      <div className="flex items-center gap-3 px-5 py-6">
+      <Link href="/" className="flex items-center gap-3 px-5 py-6 transition-opacity hover:opacity-80">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-blue-500">
           <span className="text-sm font-bold text-white">R</span>
         </div>
-        <span className="text-lg font-semibold tracking-tight text-sidebar-foreground" style={{ fontFamily: "'Capsule', var(--font-heading), sans-serif" }}>
+        <span className="text-lg font-semibold tracking-tight text-sidebar-foreground font-martian-mono">
           Reverie
         </span>
-      </div>
+      </Link>
 
       {/* Agent Status */}
-      <div className="mx-4 mb-4 rounded-lg border border-sidebar-border bg-sidebar-accent/50 px-3 py-2.5">
+      <div className="mx-4 mb-3 rounded-lg border border-sidebar-border bg-sidebar-accent/50 px-3 py-2.5">
         <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Agent Status
         </p>
@@ -74,12 +77,34 @@ export function Sidebar() {
         </div>
       </div>
 
+      {/* Anonymous Mode Toggle */}
+      <div className="mx-4 mb-4 rounded-lg border border-sidebar-border bg-sidebar-accent/50 px-3 py-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className={cn("h-3.5 w-3.5", anonymousMode ? "text-violet-400" : "text-muted-foreground")} />
+            <span className="text-xs font-medium text-sidebar-foreground">
+              Anonymous Mode
+            </span>
+          </div>
+          <Switch
+            checked={anonymousMode}
+            onCheckedChange={setAnonymousMode}
+            className="scale-75"
+          />
+        </div>
+        {anonymousMode && (
+          <p className="mt-1.5 text-[10px] text-violet-400/80">
+            Your identity is hidden from all counterparties
+          </p>
+        )}
+      </div>
+
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3">
         {navItems.map((item) => {
           const isActive =
-            item.href === "/"
-              ? pathname === "/"
+            item.href === "/dashboard"
+              ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
           return (
             <Link

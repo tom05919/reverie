@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { DealStatusBadge } from "@/components/status-badge";
+import { AnonymousBadge } from "@/components/anonymous-badge";
 import { deals } from "@/lib/mock-data";
 import { formatCurrency, formatRelativeTime } from "@/lib/format";
 import { ArrowUpRight } from "lucide-react";
@@ -37,7 +38,10 @@ export default function DealsPage() {
                 </p>
 
                 <div className="flex items-center justify-between pt-1">
-                  <DealStatusBadge status={deal.status} />
+                  <div className="flex items-center gap-1.5">
+                    <DealStatusBadge status={deal.status} />
+                    {deal.anonymous && <AnonymousBadge />}
+                  </div>
                   <span className="text-sm font-semibold tabular-nums">
                     {formatCurrency(deal.value)}
                   </span>

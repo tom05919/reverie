@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DealStatusBadge } from "@/components/status-badge";
+import { AnonymousBadge, AnonymousBanner } from "@/components/anonymous-badge";
 import { deals } from "@/lib/mock-data";
 import { formatCurrency, formatDate, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -45,6 +46,7 @@ export default async function DealDetailPage({
               {deal.title}
             </h1>
             <DealStatusBadge status={deal.status} />
+            {deal.anonymous && <AnonymousBadge />}
           </div>
           <p className="text-sm text-muted-foreground mt-1">
             {deal.counterparty.company} &middot;{" "}
@@ -155,6 +157,9 @@ export default async function DealDetailPage({
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Anonymous indicator */}
+          {deal.anonymous && <AnonymousBanner />}
+
           {/* Strategy Notes */}
           <Card className="border-border/50">
             <CardHeader>

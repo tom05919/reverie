@@ -25,6 +25,7 @@ export interface Deal {
   terms: DealTerm[];
   timeline: TimelineEvent[];
   strategyNotes: string;
+  anonymous?: boolean;
 }
 
 export interface DealTerm {
@@ -49,6 +50,7 @@ export interface Interaction {
   timestamp: string;
   outcome: InteractionOutcome;
   messages: { role: "agent" | "counterparty"; content: string }[];
+  anonymous?: boolean;
 }
 
 export interface ChatMessage {
@@ -72,6 +74,7 @@ export interface LiveNegotiation {
   counterparty: Agent;
   messages: NegotiationMessage[];
   status: "active" | "paused";
+  anonymous?: boolean;
 }
 
 export interface ActivityItem {

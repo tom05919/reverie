@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
-import { Sidebar } from "@/components/sidebar";
+import { Inter, Space_Grotesk, JetBrains_Mono, Martian_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
@@ -19,6 +18,11 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const martianMono = Martian_Mono({
+  variable: "--font-martian-mono",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Reverie — Agent Negotiation Dashboard",
   description:
@@ -33,13 +37,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} dark h-full antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${martianMono.variable} dark h-full antialiased`}
     >
-      <body className="flex h-full min-h-screen bg-background text-foreground">
-        <TooltipProvider>
-          <Sidebar />
-          <main className="ml-60 flex-1 overflow-y-auto">{children}</main>
-        </TooltipProvider>
+      <body className="h-full min-h-screen bg-background text-foreground">
+        <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>
   );

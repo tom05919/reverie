@@ -8,6 +8,7 @@ import {
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DealStatusBadge } from "@/components/status-badge";
+import { AnonymousBadge } from "@/components/anonymous-badge";
 import { deals, interactions, activityFeed } from "@/lib/mock-data";
 import { formatCurrency, formatRelativeTime } from "@/lib/format";
 
@@ -61,7 +62,6 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <Card
@@ -86,7 +86,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Active Deals */}
         <Card className="border-border/50">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base font-semibold">
@@ -107,7 +106,10 @@ export default function DashboardPage() {
                 className="flex items-center justify-between rounded-lg border border-border/50 px-4 py-3 transition-colors hover:bg-accent/50"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate">{deal.title}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium truncate">{deal.title}</p>
+                    {deal.anonymous && <AnonymousBadge />}
+                  </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {deal.counterparty.company} &middot;{" "}
                     {formatCurrency(deal.value)}
@@ -119,7 +121,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Activity Feed */}
         <Card className="border-border/50">
           <CardHeader>
             <CardTitle className="text-base font-semibold">

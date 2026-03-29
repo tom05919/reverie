@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search } from "lucide-react";
+import { Search, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OutcomeBadge } from "@/components/status-badge";
@@ -80,6 +80,9 @@ export default function InteractionsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
+                    {interaction.anonymous && (
+                      <Shield className="h-3 w-3 text-violet-400" />
+                    )}
                     <span className="text-[11px] text-muted-foreground/70">
                       {formatRelativeTime(interaction.timestamp)}
                     </span>

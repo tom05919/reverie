@@ -84,6 +84,7 @@ export const deals: Deal[] = [
     ],
     strategyNotes:
       "Acme has budget pressure this quarter but needs the capacity. We can afford to drop to $2.2M if they commit to 3 years. Do NOT go below $2.0M — that's our cost floor. The SLA ask of 99.99% is achievable for us, consider conceding it to win on price.",
+    anonymous: true,
   },
   {
     id: "d2",
@@ -132,6 +133,7 @@ export const deals: Deal[] = [
     ],
     strategyNotes:
       "GlobalSupply is a new client with high growth potential. Consider offering $15.50/unit at 50k commitment to win the account. They have alternatives from overseas suppliers at ~$13 but with 12-week lead time.",
+    anonymous: true,
   },
   {
     id: "d3",
@@ -193,6 +195,7 @@ export const deals: Deal[] = [
     ],
     strategyNotes:
       "Strong strategic fit. TechVentures has the training data we need. The 55/45 split in our favor reflects our larger compute contribution. Recommend approval.",
+    anonymous: false,
   },
   {
     id: "d4",
@@ -234,6 +237,7 @@ export const deals: Deal[] = [
       },
     ],
     strategyNotes: "Closed successfully. Good reference client for enterprise segment.",
+    anonymous: false,
   },
   {
     id: "d5",
@@ -282,6 +286,7 @@ export const deals: Deal[] = [
     ],
     strategyNotes:
       "The <2ms latency ask is technically achievable with our edge nodes but increases cost. Price at $350K if they accept 3ms. The 180-day retention is low-cost for us — concede this point early.",
+    anonymous: true,
   },
 ];
 
@@ -292,6 +297,7 @@ export const interactions: Interaction[] = [
     topic: "Cloud Infrastructure Pricing",
     timestamp: "2026-03-29T10:32:00Z",
     outcome: "ongoing",
+    anonymous: true,
     messages: [
       {
         role: "agent",
@@ -316,6 +322,7 @@ export const interactions: Interaction[] = [
     topic: "AI Research Partnership Terms",
     timestamp: "2026-03-29T08:10:00Z",
     outcome: "success",
+    anonymous: false,
     messages: [
       {
         role: "counterparty",
@@ -335,6 +342,7 @@ export const interactions: Interaction[] = [
     topic: "Sensor Component Bulk Inquiry",
     timestamp: "2026-03-28T16:45:00Z",
     outcome: "ongoing",
+    anonymous: true,
     messages: [
       {
         role: "counterparty",
@@ -377,6 +385,7 @@ export const interactions: Interaction[] = [
     topic: "Data Pipeline Latency Requirements",
     timestamp: "2026-03-29T09:45:00Z",
     outcome: "ongoing",
+    anonymous: true,
     messages: [
       {
         role: "counterparty",
@@ -406,6 +415,7 @@ export const interactions: Interaction[] = [
     topic: "SLA Uptime Discussion",
     timestamp: "2026-03-27T14:00:00Z",
     outcome: "ongoing",
+    anonymous: true,
     messages: [
       {
         role: "agent",
@@ -477,6 +487,7 @@ export const liveNegotiations: LiveNegotiation[] = [
     dealTitle: "Q3 Cloud Infrastructure Contract",
     counterparty: agents[0],
     status: "active",
+    anonymous: true,
     messages: [
       {
         id: "nm1",
@@ -525,6 +536,7 @@ export const liveNegotiations: LiveNegotiation[] = [
     dealTitle: "Data Pipeline Integration",
     counterparty: agents[4],
     status: "active",
+    anonymous: true,
     messages: [
       {
         id: "nm6",
